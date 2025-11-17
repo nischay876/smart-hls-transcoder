@@ -19,6 +19,8 @@ program
   .option('--crf-offset <value>', 'CRF offset adjustment (-5 to +5)', '0')
   .option('--min-quality <quality>', 'Minimum quality to generate (144,240,360,480)', '360')
   .option('--skip-analysis', 'Skip source file analysis (faster but less accurate)', false)
+  .option('--sequential', 'Process qualities sequentially (one at a time) instead of parallel', false)
+  .option('--max-concurrent <number>', 'Maximum number of concurrent encodes (default: unlimited/CPU cores)', '')
   .action(async (options) => {
     try {
       if (!options.input) {
@@ -34,6 +36,14 @@ program
       console.log(`🎬 Smart HLS Transcoding Started`);
       console.log(`📥 Input: ${options.input}`);
       console.log(`📤 Output: ${path.resolve(options.output)}`);
+      
+      if (options.sequential) {
+        console.log(`🔄 Processing mode: Sequential (one quality at a time)`);
+      } else if (options.maxConcurrent) {
+        console.log(`⚡ Processing mode: Parallel (max ${options.maxConcurrent} concurrent)`);
+      } else {
+        console.log(`⚡ Processing mode: Parallel (unlimited)`);
+      }
 
       await transcodeVideo({
         input: options.input,
@@ -43,7 +53,9 @@ program
         preset: options.preset,
         crfOffset: parseInt(options.crfOffset),
         minQuality: parseInt(options.minQuality),
-        skipAnalysis: options.skipAnalysis
+        skipAnalysis: options.skipAnalysis,
+        sequential: options.sequential,
+        maxConcurrent: options.maxConcurrent ? parseInt(options.maxConcurrent) : null
       });
 
       console.log('\n✅ Transcoding completed successfully!');
