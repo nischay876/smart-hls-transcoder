@@ -23,6 +23,7 @@ program
   .option('--max-concurrent <number>', 'Maximum number of concurrent encodes (default: unlimited/CPU cores)', '')
   .option('--gpu', 'Use GPU acceleration if available', false)
   .option('--gpu-type <type>', 'GPU type: nvidia, intel, amd, apple (auto-detected if not specified)', 'auto')
+  .option('--show-gpu-usage', 'Show GPU usage during transcoding', false)
   .action(async (options) => {
     try {
       if (!options.input) {
@@ -40,9 +41,13 @@ program
       console.log(`📤 Output: ${path.resolve(options.output)}`);
       
       if (options.gpu) {
-        console.log(`🎮 GPU Acceleration: ENABLED (${options.gpuType})`);
+        console.log(`🎮 GPU Acceleration: ENABLED`);
       } else {
         console.log(`💻 Processing: CPU`);
+      }
+      
+      if (options.showGpuUsage) {
+        console.log(`📊 GPU Usage Monitoring: ENABLED`);
       }
       
       if (options.sequential) {
@@ -65,7 +70,8 @@ program
         sequential: options.sequential,
         maxConcurrent: options.maxConcurrent ? parseInt(options.maxConcurrent) : null,
         useGpu: options.gpu,
-        gpuType: options.gpuType
+        gpuType: options.gpuType,
+        showGpuUsage: options.showGpuUsage
       });
 
       console.log('\n✅ Transcoding completed successfully!');

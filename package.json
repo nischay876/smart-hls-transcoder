@@ -1,6 +1,6 @@
 {
   "name": "smart-hls-transcoder",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Intelligent CLI tool for transcoding videos to optimized HLS format with GPU acceleration support",
   "main": "lib/transcoder.js",
   "bin": {
@@ -32,6 +32,7 @@
   },
   "homepage": "https://github.com/nischay876/smart-hls-transcoder#readme",
   "dependencies": {
+    "@fal-ai/serverless-client": "^0.15.0",
     "axios": "^1.13.2",
     "commander": "^11.1.0",
     "fluent-ffmpeg": "^2.1.3",

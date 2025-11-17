@@ -14,6 +14,7 @@ An intelligent CLI tool that automatically optimizes HLS transcoding based on so
 - 🌐 **URL Support**: Directly transcode from remote URLs
 - 📊 **Source Analysis**: Intelligently analyzes source characteristics
 - 🎮 **GPU Acceleration**: Optional NVIDIA/Intel/AMD/Apple GPU support
+- 📈 **GPU Usage Monitoring**: Real-time GPU utilization tracking
 - 🔄 **Flexible Processing**: Sequential or parallel processing modes
 
 ## Prerequisites
@@ -58,6 +59,9 @@ transcode -i input.mp4 -o output --gpu
 
 # Specify GPU type
 transcode -i input.mp4 -o output --gpu --gpu-type nvidia
+
+# Show GPU usage during transcoding
+transcode -i input.mp4 -o output --gpu --show-gpu-usage
 ```
 
 ### System Resource Management
@@ -115,6 +119,7 @@ transcode -i input.mp4 -o output --min-quality 144
 | `--max-concurrent <number>` | Max simultaneous encodes | Unlimited |
 | `--gpu` | Enable GPU acceleration | false |
 | `--gpu-type <type>` | GPU type: nvidia, intel, amd, apple | auto |
+| `--show-gpu-usage` | Show GPU usage during transcoding | false |
 
 ## Output Structure
 
@@ -145,6 +150,12 @@ hls-output/
 - 🚀 **Higher throughput** for batch processing
 - 💰 **Reduced electricity costs**
 
+### GPU Information:
+When using `--gpu`, the tool automatically detects and displays:
+- Your specific GPU model name
+- The GPU type being used for transcoding
+- Real-time GPU usage statistics (when `--show-gpu-usage` is enabled)
+
 ## Examples
 
 ### 4K Source File
@@ -157,6 +168,12 @@ transcode -i 4k-video.mp4 -o hls-4k
 ```bash
 transcode -i 720p-video.mp4 -o hls-720p --gpu
 # Output: 720p, 480p, 360p (no upscaling!) with GPU acceleration
+```
+
+### GPU Usage Monitoring
+```bash
+transcode -i video.mp4 -o output --gpu --show-gpu-usage
+# Shows real-time GPU utilization percentage during transcoding
 ```
 
 ### High Quality Preservation
@@ -188,7 +205,8 @@ await transcodeVideo({
   sequential: false,
   maxConcurrent: null,
   useGpu: false,
-  gpuType: 'auto'
+  gpuType: 'auto',
+  showGpuUsage: false  // New option for GPU monitoring
 });
 ```
 
@@ -225,12 +243,19 @@ Make sure FFmpeg is installed and accessible in your PATH.
 - Ensure proper GPU drivers are installed
 - Verify FFmpeg was compiled with GPU support
 - Try specifying `--gpu-type` explicitly
+- Check that GPU monitoring tools are available (nvidia-smi for NVIDIA)
+
+### GPU Usage Monitoring Not Working
+- Ensure `nvidia-smi` is installed for NVIDIA GPUs
+- GPU usage monitoring currently supports NVIDIA primarily
+- Other GPU types may show limited or no usage data
 
 ## Requirements
 
 - Node.js ≥ 14.0.0
 - FFmpeg with required codecs
 - For GPU acceleration: Compatible GPU with proper drivers
+- For GPU usage monitoring: nvidia-smi (for NVIDIA GPUs)
 
 ## License
 
