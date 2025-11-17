@@ -15,6 +15,7 @@ program
   .option('-o, --output <folder>', 'Output folder for HLS files')
   .option('-b, --bandwidth-ratio <ratio>', 'Bandwidth ratio for quality generation (0.1-2.0)', '1.0')
   .option('--segment-duration <seconds>', 'HLS segment duration', '6')
+  .option('--segment-size <megabytes>', 'HLS segment size in MB (alternative to segment duration)', '')
   .option('--preset <preset>', 'FFmpeg preset (ultrafast,superfast,veryfast,faster,fast,medium,slow,slower,veryslow)', 'medium')
   .option('--crf-offset <value>', 'CRF offset adjustment (-5 to +5)', '0')
   .option('--min-quality <quality>', 'Minimum quality to generate (144,240,360,480)', '360')
@@ -36,9 +37,21 @@ program
         process.exit(1);
       }
 
+      // Validate segment options
+      if (options.segmentSize && options.segmentDuration && options.segmentDuration !== '6') {
+        console.error('❌ Error: Cannot specify both --segment-duration and --segment-size');
+        process.exit(1);
+      }
+
       console.log(`🎬 Smart HLS Transcoding Started`);
       console.log(`📥 Input: ${options.input}`);
       console.log(`📤 Output: ${path.resolve(options.output)}`);
+      
+      if (options.segmentSize) {
+        console.log(`📏 Segment Size: ${options.segmentSize} MB`);
+      } else {
+        console.log(`⏱️ Segment Duration: ${options.segmentDuration} seconds`);
+      }
       
       if (options.gpu) {
         console.log(`🎮 GPU Acceleration: ENABLED`);
@@ -62,7 +75,8 @@ program
         input: options.input,
         output: path.resolve(options.output),
         bandwidthRatio: parseFloat(options.bandwidthRatio),
-        segmentDuration: parseInt(options.segmentDuration),
+        segmentDuration: options.segmentSize ? null : parseInt(options.segmentDuration),
+        segmentSize: options.segmentSize ? parseFloat(options.segmentSize) : null,
         preset: options.preset,
         crfOffset: parseInt(options.crfOffset),
         minQuality: parseInt(options.minQuality),

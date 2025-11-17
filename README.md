@@ -9,6 +9,7 @@ An intelligent CLI tool that automatically optimizes HLS transcoding based on so
 
 - 🎯 **Automatic Quality Detection**: Only generates qualities suitable for your source
 - ⚡ **Smart Bitrate Optimization**: Dynamically calculates optimal bitrates
+- 📏 **Segment Size Control**: Option to create fixed-size segments (e.g., all 6MB) instead of fixed-duration segments
 - 📏 **No Upscaling**: Never upscales beyond source resolution
 - 🎨 **Adaptive CRF**: Automatically adjusts compression based on source quality
 - 🌐 **URL Support**: Directly transcode from remote URLs
@@ -111,6 +112,7 @@ transcode -i input.mp4 -o output --min-quality 144
 | `-o, --output <folder>` | Output folder for HLS files | Required |
 | `-b, --bandwidth-ratio <ratio>` | Bandwidth adjustment (0.1-2.0) | 1.0 |
 | `--segment-duration <seconds>` | HLS segment duration | 6 |
+| `--segment-size <megabytes>` | HLS segment size in MB (alternative to duration) | None |
 | `--preset <preset>` | FFmpeg preset | medium |
 | `--crf-offset <value>` | CRF adjustment (-5 to +5) | 0 |
 | `--min-quality <quality>` | Minimum quality to generate | 360 |
@@ -188,6 +190,17 @@ transcode -i video.mp4 -o output --sequential --bandwidth-ratio 0.8
 # Processes one quality at a time with reduced bitrates
 ```
 
+### Segment Control
+```bash
+# Use fixed-duration segments (default: 6 seconds)
+transcode -i input.mp4 -o output --segment-duration 4
+
+# Use fixed-size segments (all segments ~6MB regardless of resolution)
+transcode -i input.mp4 -o output --segment-size 6
+
+# Note: Cannot use both --segment-duration and --segment-size together
+```
+
 ## Programmatic Usage
 
 ```javascript
@@ -197,7 +210,8 @@ await transcodeVideo({
   input: './input.mp4',
   output: './hls-output',
   bandwidthRatio: 1.0,
-  segmentDuration: 6,
+  segmentSize: 6,
+  // segmentDuration: 6,
   preset: 'medium',
   crfOffset: 0,
   minQuality: 360,
