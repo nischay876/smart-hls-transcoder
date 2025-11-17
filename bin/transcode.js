@@ -21,6 +21,8 @@ program
   .option('--skip-analysis', 'Skip source file analysis (faster but less accurate)', false)
   .option('--sequential', 'Process qualities sequentially (one at a time) instead of parallel', false)
   .option('--max-concurrent <number>', 'Maximum number of concurrent encodes (default: unlimited/CPU cores)', '')
+  .option('--gpu', 'Use GPU acceleration if available', false)
+  .option('--gpu-type <type>', 'GPU type: nvidia, intel, amd, apple (auto-detected if not specified)', 'auto')
   .action(async (options) => {
     try {
       if (!options.input) {
@@ -36,6 +38,12 @@ program
       console.log(`🎬 Smart HLS Transcoding Started`);
       console.log(`📥 Input: ${options.input}`);
       console.log(`📤 Output: ${path.resolve(options.output)}`);
+      
+      if (options.gpu) {
+        console.log(`🎮 GPU Acceleration: ENABLED (${options.gpuType})`);
+      } else {
+        console.log(`💻 Processing: CPU`);
+      }
       
       if (options.sequential) {
         console.log(`🔄 Processing mode: Sequential (one quality at a time)`);
@@ -55,7 +63,9 @@ program
         minQuality: parseInt(options.minQuality),
         skipAnalysis: options.skipAnalysis,
         sequential: options.sequential,
-        maxConcurrent: options.maxConcurrent ? parseInt(options.maxConcurrent) : null
+        maxConcurrent: options.maxConcurrent ? parseInt(options.maxConcurrent) : null,
+        useGpu: options.gpu,
+        gpuType: options.gpuType
       });
 
       console.log('\n✅ Transcoding completed successfully!');
