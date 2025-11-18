@@ -10,7 +10,7 @@ const program = new Command();
 program
   .name('transcode')
   .description('Intelligent CLI tool for transcoding videos to optimized HLS format')
-  .version('1.1.0')
+  .version('1.2.0')
   .option('-i, --input <url>', 'Input video file path or URL')
   .option('-o, --output <folder>', 'Output folder for HLS files')
   .option('-b, --bandwidth-ratio <ratio>', 'Bandwidth ratio for quality generation (0.1-2.0)', '1.0')
@@ -25,6 +25,7 @@ program
   .option('--gpu', 'Use GPU acceleration if available', false)
   .option('--gpu-type <type>', 'GPU type: nvidia, intel, amd, apple (auto-detected if not specified)', 'auto')
   .option('--show-gpu-usage', 'Show GPU usage during transcoding', false)
+  .option('--dry-run', 'Show what would be done without actually doing it', false)
   .action(async (options) => {
     try {
       if (!options.input) {
@@ -43,53 +44,67 @@ program
         process.exit(1);
       }
 
-      console.log(`🎬 Smart HLS Transcoding Started`);
-      console.log(`📥 Input: ${options.input}`);
-      console.log(`📤 Output: ${path.resolve(options.output)}`);
-      
-      if (options.segmentSize) {
-        console.log(`📏 Segment Size: ${options.segmentSize} MB`);
-      } else {
-        console.log(`⏱️ Segment Duration: ${options.segmentDuration} seconds`);
+      // Validate numeric inputs
+      const bandwidthRatio = parseFloat(options.bandwidthRatio);
+      if (isNaN(bandwidthRatio) || bandwidthRatio < 0.1 || bandwidthRatio > 2.0) {
+        console.error('❌ Error: Bandwidth ratio must be between 0.1 and 2.0');
+        process.exit(1);
       }
-      
-      if (options.gpu) {
-        console.log(`🎮 GPU Acceleration: ENABLED`);
-      } else {
-        console.log(`💻 Processing: CPU`);
+
+      const crfOffset = parseInt(options.crfOffset);
+      if (isNaN(crfOffset) || crfOffset < -5 || crfOffset > 5) {
+        console.error('❌ Error: CRF offset must be between -5 and +5');
+        process.exit(1);
       }
-      
-      if (options.showGpuUsage) {
-        console.log(`📊 GPU Usage Monitoring: ENABLED`);
+
+      const minQuality = parseInt(options.minQuality);
+      if (isNaN(minQuality) || ![144, 240, 360, 480, 540, 720, 1080, 1440, 2160, 2880, 3600, 4320, 5040, 5760, 6480, 7200, 7920, 8640].includes(minQuality)) {
+        console.error('❌ Error: Min quality must be a supported resolution');
+        process.exit(1);
       }
-      
-      if (options.sequential) {
-        console.log(`🔄 Processing mode: Sequential (one quality at a time)`);
-      } else if (options.maxConcurrent) {
-        console.log(`⚡ Processing mode: Parallel (max ${options.maxConcurrent} concurrent)`);
-      } else {
-        console.log(`⚡ Processing mode: Parallel (unlimited)`);
+
+      const segmentDuration = options.segmentSize ? null : parseInt(options.segmentDuration);
+      if (segmentDuration && (isNaN(segmentDuration) || segmentDuration <= 0)) {
+        console.error('❌ Error: Segment duration must be a positive number');
+        process.exit(1);
+      }
+
+      const segmentSize = options.segmentSize ? parseFloat(options.segmentSize) : null;
+      if (segmentSize && (isNaN(segmentSize) || segmentSize <= 0)) {
+        console.error('❌ Error: Segment size must be a positive number');
+        process.exit(1);
+      }
+
+      const maxConcurrent = options.maxConcurrent ? parseInt(options.maxConcurrent) : null;
+      if (maxConcurrent && (isNaN(maxConcurrent) || maxConcurrent <= 0)) {
+        console.error('❌ Error: Max concurrent must be a positive number');
+        process.exit(1);
       }
 
       await transcodeVideo({
         input: options.input,
         output: path.resolve(options.output),
-        bandwidthRatio: parseFloat(options.bandwidthRatio),
-        segmentDuration: options.segmentSize ? null : parseInt(options.segmentDuration),
-        segmentSize: options.segmentSize ? parseFloat(options.segmentSize) : null,
+        bandwidthRatio,
+        segmentDuration,
+        segmentSize,
         preset: options.preset,
-        crfOffset: parseInt(options.crfOffset),
-        minQuality: parseInt(options.minQuality),
+        crfOffset,
+        minQuality,
         skipAnalysis: options.skipAnalysis,
         sequential: options.sequential,
-        maxConcurrent: options.maxConcurrent ? parseInt(options.maxConcurrent) : null,
+        maxConcurrent,
         useGpu: options.gpu,
         gpuType: options.gpuType,
-        showGpuUsage: options.showGpuUsage
+        showGpuUsage: options.showGpuUsage,
+        dryRun: options.dryRun
       });
 
-      console.log('\n✅ Transcoding completed successfully!');
-      console.log(`📁 HLS files are available in: ${path.resolve(options.output)}`);
+      if (!options.dryRun) {
+        console.log('\n✅ Transcoding completed successfully!');
+        console.log(`📁 HLS files are available in: ${path.resolve(options.output)}`);
+      } else {
+        console.log('\n📋 Dry run completed successfully!');
+      }
 
     } catch (error) {
       console.error('❌ Error:', error.message);

@@ -1,8 +1,11 @@
 {
-  "name": "smart-hls-transcoder",
-  "version": "1.1.0",
+  "name": "@nischay876/smart-hls-transcoder",
+  "version": "1.2.0",
   "description": "Intelligent CLI tool for transcoding videos to optimized HLS format with GPU acceleration support",
-  "main": "lib/transcoder.js",
+  "main": "lib/transcode.js",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "bin": {
     "transcode": "bin/transcode.js"
   },
@@ -21,7 +24,7 @@
     "nvenc",
     "hardware-acceleration"
   ],
-  "author": "Your Name <hello@nischay.eu.org>",
+  "author": "Nischay Sharma <hello@nischay.eu.org>",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -32,12 +35,12 @@
   },
   "homepage": "https://github.com/nischay876/smart-hls-transcoder#readme",
   "dependencies": {
-    "@fal-ai/serverless-client": "^0.15.0",
     "axios": "^1.13.2",
     "commander": "^11.1.0",
     "fluent-ffmpeg": "^2.1.3",
     "fs-extra": "^11.3.2",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "winston": "^3.11.0"
   },
   "engines": {
     "node": ">=14.0.0"

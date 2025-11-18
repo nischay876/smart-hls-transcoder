@@ -1,0 +1,40 @@
+name: Publish to GitHub Packages
+
+on:
+  push:
+    tags:
+      - "v*"   # e.g. v1.2.0 → triggers publish
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write   # IMPORTANT
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@nischay876"
+
+      - name: Setup .npmrc
+        run: |
+          echo "@nischay876:registry=https://npm.pkg.github.com" > .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> .npmrc
+
+      - name: Install Dependencies
+        run: npm install
+
+      # Optional: If you have a build step
+      # - name: Build
+      #   run: npm run build
+
+      - name: Publish Package
+        run: npm publish
