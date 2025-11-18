@@ -10,7 +10,7 @@ const program = new Command();
 program
   .name('transcode')
   .description('Intelligent CLI tool for transcoding videos to optimized HLS format')
-  .version('1.2.0')
+  .version('1.1.3')
   .option('-i, --input <url>', 'Input video file path or URL')
   .option('-o, --output <folder>', 'Output folder for HLS files')
   .option('-b, --bandwidth-ratio <ratio>', 'Bandwidth ratio for quality generation (0.1-2.0)', '1.0')
