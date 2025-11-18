@@ -1,11 +1,8 @@
 {
-  "name": "@nischay876/smart-hls-transcoder",
+  "name": "smart-hls-transcoder",
   "version": "1.0.0",
   "description": "Intelligent CLI tool for transcoding videos to optimized HLS format with GPU acceleration support",
   "main": "lib/transcode.js",
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
-  },
   "bin": {
     "transcode": "bin/transcode.js"
   },
